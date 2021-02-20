@@ -911,7 +911,7 @@ public class JPackagerMojo extends AbstractPackageToolMojo
 
         if ( this.mainClass != null )
         {
-            argsFile.println( "--class" );
+            argsFile.println( "--main-class" );
             argsFile.println(  this.mainClass );
         }
 
@@ -1461,7 +1461,7 @@ public class JPackagerMojo extends AbstractPackageToolMojo
 
         if ( this.mainClass != null )
         {
-            cmd.createArg().setValue( "--class" );
+            cmd.createArg().setValue( "--main-class" );
             cmd.createArg().setValue(  this.mainClass );
         }
 
@@ -1940,23 +1940,15 @@ public class JPackagerMojo extends AbstractPackageToolMojo
             this.getLog().error( message );
             throw new MojoFailureException( message );
         }
-        int c = 0;
-        if ( this.module != null )
+        boolean valid = this.module != null && (this.mainClass == null && this.mainJar == null);
+        if (!valid)
         {
-            c++;
+            valid = this.mainClass != null && this.mainJar != null;
         }
-        if ( this.mainClass != null )
-        {
-            c++;
-        }
-        if ( this.mainJar != null )
-        {
-            c++;
-        }
-        if ( c > 1 )
+        if (!valid)
         {
             // CHECKSTYLE_OFF: LineLength
-            final String message = "The parameters <module>, <mainClass> or <mainJar> \nare mutually exclusive, only one of them can be specified.";
+            final String message = "The parameters <module>, <mainClass> or <mainJar> \nare mutually exclusive, only module / mainJar+mainClass can be specified.";
             // CHECKSTYLE_ON: LineLength
             this.getLog().error( message );
             throw new MojoFailureException( message );
